@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="utm.pam">
 
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <uses-feature android:name="android.hardware.type.watch" />
@@ -26,15 +27,15 @@
             android:value="true" />
 
         <activity
-            android:name=".NewItemActivity"
+            android:name=".activities.NewItemActivity"
             android:label="@string/title_activity_new_item" />
         <activity
-            android:name=".UpdateItemActivity"
+            android:name=".activities.UpdateItemActivity"
             android:label="@string/title_activity_update_item" />
         <activity
-            android:name=".SearchItemActivity"
+            android:name=".activities.SearchItemActivity"
             android:label="SearchItemActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

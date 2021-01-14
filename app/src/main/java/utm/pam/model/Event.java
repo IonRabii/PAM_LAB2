@@ -1,25 +1,27 @@
-package utm.pam.db;
+package utm.pam.model;
 
 import org.simpleframework.xml.Default;
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.Root;
 
 @Default
-public class CalendarItem {
-    //    @Element
+public class Event {
+    private String id;
     private String date;
-    //    @Element
     private String title;
-    //    @Element
     private String description;
 
-    public CalendarItem() {
-    }
-
-    public CalendarItem(String date, String title, String description) {
+    public Event(String id, String date, String title, String description) {
+        this.id = id;
         this.date = date;
         this.title = title;
         this.description = description;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getDate() {
@@ -44,14 +46,5 @@ public class CalendarItem {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    @Override
-    public String toString() {
-        return "CalendarItem{" +
-                "date='" + date + '\'' +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                '}';
     }
 }

@@ -1,36 +1,24 @@
-package utm.pam;
+package utm.pam.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
 
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.core.Persister;
+import androidx.appcompat.app.AppCompatActivity;
 
-import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import utm.pam.db.CalendarItem;
-import utm.pam.db.Storage;
+import utm.pam.R;
+import utm.pam.dao.EventRepository;
 
-import static java.util.Arrays.asList;
-import static utm.pam.Util.showNotification;
+import static utm.pam.util.Util.createRepositoryInstance;
+import static utm.pam.util.Util.showNotification;
 
 public class MainActivity extends AppCompatActivity {
+    private EventRepository eventRepository;
     private LocalDate date;
 
     public MainActivity() {
@@ -41,50 +29,51 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        eventRepository = createRepositoryInstance(getFilesDir());
 
         CalendarView calendarView = (CalendarView) findViewById(R.id.calendarView);
         calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
             date = LocalDate.of(year, month + 1, dayOfMonth);
         });
 
-        // manage add
+        manageAddEvent();
+        manageUpdateEvent();
+        manageDeleteEvent();
+        manageSearchEvents();
+    }
+
+    private void manageAddEvent() {
         Button addItem = (Button) findViewById(R.id.add);
         addItem.setOnClickListener((view) -> {
             Intent intent = new Intent(this, NewItemActivity.class);
             intent.putExtra("DATE", String.valueOf(date.format(DateTimeFormatter.BASIC_ISO_DATE)));
             startActivity(intent);
         });
+    }
 
-        // manage update
+    private void manageUpdateEvent() {
         Button updateItem = (Button) findViewById(R.id.update);
         updateItem.setOnClickListener((view) -> {
             Intent intent = new Intent(this, UpdateItemActivity.class);
             intent.putExtra("DATE", String.valueOf(date.format(DateTimeFormatter.BASIC_ISO_DATE)));
             startActivity(intent);
         });
+    }
 
-        // manage delete
+    private void manageDeleteEvent() {
         Button deleteItem = (Button) findViewById(R.id.remove);
         deleteItem.setOnClickListener((view) -> {
-            try {
-                Serializer serializer = new Persister();
-                Storage storage = serializer.read(Storage.class, new File(getFilesDir(), "calendar_database.xml"));
-                final String stringData = String.valueOf(date.format(DateTimeFormatter.BASIC_ISO_DATE));
-                List<CalendarItem> items = storage.getItems().stream().filter(e -> !stringData.equals(e.getDate()))
-                        .collect(Collectors.toList());
-                storage.setItems(items);
-                serializer.write(storage, new File(getFilesDir(), "calendar_database.xml"));
-                showNotification("Event deleted!", this);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            final String stringData = String.valueOf(date.format(DateTimeFormatter.BASIC_ISO_DATE));
+            eventRepository.delete(stringData);
+            showNotification("Event deleted!", this);
         });
+    }
 
-        // manage search
+    private void manageSearchEvents() {
         Button search = (Button) findViewById(R.id.search);
         EditText editText = (EditText) findViewById(R.id.edit_query);
-        String prefix = editText.getText() == null ? "" : editText.getText().toString();
         search.setOnClickListener((view) -> {
+            String prefix = editText.getText() == null ? "" : editText.getText().toString();
             Intent intent = new Intent(this, SearchItemActivity.class);
             intent.putExtra("TITLE", prefix);
             startActivity(intent);

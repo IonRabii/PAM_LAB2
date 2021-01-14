@@ -1,4 +1,4 @@
-package utm.pam;
+package utm.pam.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,10 +17,11 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import utm.pam.db.CalendarItem;
-import utm.pam.db.Storage;
+import utm.pam.R;
+import utm.pam.model.Event;
+import utm.pam.model.Database;
 
-import static utm.pam.Util.showNotification;
+import static utm.pam.util.Util.showNotification;
 
 public class SearchItemActivity extends AppCompatActivity {
 
@@ -35,27 +36,27 @@ public class SearchItemActivity extends AppCompatActivity {
 
         try {
             Serializer serializer = new Persister();
-            Storage storage = serializer.read(Storage.class, new File(getFilesDir(), "calendar_database.xml"));
+            Database database = serializer.read(Database.class, new File(getFilesDir(), "calendar_database.xml"));
 
-            Predicate<CalendarItem> filter = title == null || title.isEmpty()
+            Predicate<Event> filter = title == null || title.isEmpty()
                     ? e -> true
                     : e -> e.getTitle().startsWith(title);
-            List<CalendarItem> items = storage.getItems().stream()
+            List<Event> events = database.getEvents().stream()
                     .filter(filter).collect(Collectors.toList());
 
-            if (items.isEmpty()) {
+            if (events.isEmpty()) {
                 showNotification("No events were found", this);
             } else {
                 int i = 1;
-                for (CalendarItem item : items) {
+                for (Event event : events) {
                     View tableRow = LayoutInflater.from(this).inflate(R.layout.table_item, null, false);
                     TextView event_display_no = (TextView) tableRow.findViewById(R.id.event_display_no);
                     TextView event_display_date = (TextView) tableRow.findViewById(R.id.event_display_date);
                     TextView event_display_title = (TextView) tableRow.findViewById(R.id.event_display_title);
 
                     event_display_no.setText(String.valueOf(i));
-                    event_display_date.setText(formatData(item.getDate()));
-                    event_display_title.setText(item.getTitle());
+                    event_display_date.setText(formatData(event.getDate()));
+                    event_display_title.setText(event.getTitle());
                     tableLayout.addView(tableRow);
                     i++;
                 }
