@@ -33,7 +33,7 @@ public class AlarmService extends Service {
         final String activities = intent.getStringExtra(TITLE);
         Intent notificationIntent = new Intent(this, RingActivity.class);
         notificationIntent.putExtra(TITLE, activities);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
         String alarmTitle = "List of activities";
 
