@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -39,23 +40,25 @@ public class DatabaseManagerImpl implements DatabaseManager {
         try {
             Database database = serializer.read(Database.class, new File(path, sourceFile));
             return database.getEvents();
-        } catch (FileNotFoundException e) {
-            if (createFile())
-                return Collections.emptyList();
-            else
-                throw new RuntimeException("Can't create file " + sourceFile + " on path " + path.getAbsolutePath());
         } catch (Exception e) {
             e.printStackTrace();
-            commit(asList(new Event("0", "", "", "")));
-            return Collections.emptyList();
         }
+        return new ArrayList<Event>();
     }
 
     @Override
     public void commit(List<Event> events) {
         try {
             final Database database = serializer.read(Database.class, new File(path, sourceFile));
+            database.setEvents(events);
             serializer.write(database, new File(path, sourceFile));
+        } catch (FileNotFoundException e) {
+            final Database database = new Database(events);
+            try {
+                serializer.write(database, new File(path, sourceFile));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

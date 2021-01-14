@@ -11,4 +11,5 @@
     <string name="add_event">Add Event</string>
     <string name="update_event">Update event</string>
     <string name="choose_event_from_list">Choose event from list</string>
+    <string name="dismiss">Dismiss</string>
 </resources>

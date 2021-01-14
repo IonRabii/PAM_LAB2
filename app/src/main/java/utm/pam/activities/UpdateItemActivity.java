@@ -63,14 +63,12 @@ public class UpdateItemActivity extends AppCompatActivity {
     }
 
     private void updateForm(final String key) {
-        if (key.equals("default")) return;
-
-        selectedEvent = eventRepository.getById(key);
+        selectedEvent = key.equals("default") ? null : eventRepository.getById(key);
         EditText title = (EditText) findViewById(R.id.event_title);
-        title.setText(selectedEvent.getTitle());
+        title.setText(key.equals("default") ? "" : selectedEvent.getTitle());
 
         EditText description = (EditText) findViewById(R.id.event_description);
-        description.setText(selectedEvent.getDescription());
+        description.setText(key.equals("default") ? "" : selectedEvent.getDescription());
     }
 
     private void updateEvent(final Spinner spinner, final String date) {
@@ -89,6 +87,8 @@ public class UpdateItemActivity extends AppCompatActivity {
                 .filter(e -> date.equals(e.getDate()))
                 .collect(Collectors.toList());
 
+        items.clear();
+        values.clear();
         events.forEach(e -> {
             items.add(e.getTitle());
             values.add(e.getId());
@@ -101,5 +101,6 @@ public class UpdateItemActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
         spinner.setSelection(0);
+        updateForm("default");
     }
 }

@@ -15,6 +15,10 @@ public class Database {
         this.events = new ArrayList<>();
     }
 
+    public Database(List<Event> events) {
+        this.events = events;
+    }
+
     public List<Event> getEvents() {
         return events;
     }

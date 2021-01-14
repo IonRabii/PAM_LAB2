@@ -37,7 +37,14 @@ public class EventRepositoryImpl implements EventRepository {
 
     @Override
     public void delete(final String id) {
-        List<Event> events = this.events.stream().filter(event -> !id.equals(event.getId())).collect(Collectors.toList());
+        List<Event> events = this.events.stream().filter(event -> id.equals(event.getId())).collect(Collectors.toList());
+        this.events.removeAll(events);
+        commit();
+    }
+
+    @Override
+    public void deleteByDate(String date) {
+        List<Event> events = this.events.stream().filter(event -> date.equals(event.getDate())).collect(Collectors.toList());
         this.events.removeAll(events);
         commit();
     }

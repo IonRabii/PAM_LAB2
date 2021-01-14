@@ -1,6 +1,9 @@
 package utm.pam.activities;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.CalendarView;
@@ -13,12 +16,16 @@ import java.time.format.DateTimeFormatter;
 
 import utm.pam.R;
 import utm.pam.dao.EventRepository;
+import utm.pam.services.Impl.SchedulerServiceImpl;
+import utm.pam.services.SchedulerService;
 
+import static utm.pam.services.Impl.SchedulerServiceImpl.CHANNEL_ID;
 import static utm.pam.util.Util.createRepositoryInstance;
 import static utm.pam.util.Util.showNotification;
 
 public class MainActivity extends AppCompatActivity {
     private EventRepository eventRepository;
+    private SchedulerService schedulerService;
     private LocalDate date;
 
     public MainActivity() {
@@ -30,6 +37,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         eventRepository = createRepositoryInstance(getFilesDir());
+        schedulerService = new SchedulerServiceImpl(eventRepository);
+        createNotificationChannnel();
+        schedulerService.schedule("20210114", this);
 
         CalendarView calendarView = (CalendarView) findViewById(R.id.calendarView);
         calendarView.setOnDateChangeListener((view1, year, month, dayOfMonth) -> {
@@ -64,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         Button deleteItem = (Button) findViewById(R.id.remove);
         deleteItem.setOnClickListener((view) -> {
             final String stringData = String.valueOf(date.format(DateTimeFormatter.BASIC_ISO_DATE));
-            eventRepository.delete(stringData);
+            eventRepository.deleteByDate(stringData);
             showNotification("Event deleted!", this);
         });
     }
@@ -78,5 +88,18 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("TITLE", prefix);
             startActivity(intent);
         });
+    }
+
+    private void createNotificationChannnel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel serviceChannel = new NotificationChannel(
+                    CHANNEL_ID,
+                    "Alarm Service Channel",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(serviceChannel);
+        }
     }
 }

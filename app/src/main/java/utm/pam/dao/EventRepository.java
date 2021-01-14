@@ -12,6 +12,8 @@ public interface EventRepository {
 
     void delete(final String id);
 
+    void deleteByDate(final String date);
+
     List<Event> getAll();
 
     List<Event> getByDate(final String date);
